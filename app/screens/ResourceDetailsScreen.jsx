@@ -120,7 +120,10 @@ export default function ResourceDetaiLScreen({ navigation, route }) {
                 </View>
                 <View className="flex flex-row justify-between bg-gray-200 p-3 rounded-2xl">
                     <Text className="text-gray-800 font-medium">Requested By</Text>
-                    <Text className="font-normal text-blue-500">@{username.firstName + username.lastName}</Text>
+                    <TouchableOpacity onPress={() => {navigation.navigate('UserInfo', {id : username._id})}}>
+                        <Text className="font-normal text-blue-500">@{username.firstName + username.lastName}</Text>
+                    </TouchableOpacity>
+                    
                 </View>
                 <Text className="font-semibold text-lg">Details</Text>
                 <Text className="text-gray-600 text-lg bg-gray-200 p-2 rounded-2xl">{resource.resourceDescription}</Text>

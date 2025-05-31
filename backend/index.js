@@ -432,6 +432,8 @@ app.put('/declinerequest/:senderId', profileMiddleWare, async (req, res) => {
             }
         }
     })
+
+    res.json({ msg: "request rejected" })
 })
 
 app.put('/addingcomment/:id', profileMiddleWare, async (req, res) => {
