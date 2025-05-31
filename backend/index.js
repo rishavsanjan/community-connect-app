@@ -3,7 +3,7 @@ const { createUser, createResourceRequest, createResourceAvailable } = require('
 const { User, Resource, ResourceAvailable, Messages, Report, Notifications} = require('./db');
 const app = express();
 const cors = require('cors');
-const { middleWare, emailCheckMiddlware, passwordCheckMiddlware, profileMiddleWare } = require('./middleware.js');
+const { middleWare, emailCheckMiddlware, passwordCheckMiddlware, profileMiddleWare, loginCheck } = require('./middleware.js');
 const { JWT_SECRET } = require('./config.js');
 const jwt = require("jsonwebtoken");
 const { connections } = require('mongoose');
@@ -158,7 +158,6 @@ app.post('/login', emailCheckMiddlware, passwordCheckMiddlware, async (req, res)
 
 app.get('/profile', profileMiddleWare, async (req, res) => {
     const user = req.user;
-    console.log(user)
     res.json({
         userId: user._id,
         firstName: user.firstName,
@@ -173,8 +172,9 @@ app.get('/profile', profileMiddleWare, async (req, res) => {
         resourceAvailable: user.resourceAvailable,
         connectionsRequestsSent: user.connectionsRequestsSent,
         notifications: user.notifications,
-        profile: user.profile,
-        verified: user.verified
+        profilePic: user.profilePic,
+        verified: user.verified,
+        backPic:user.backPic
     });
 });
 
@@ -223,13 +223,13 @@ app.get('/resourcerequest', async (req, res) => {
 
 app.put('/editprofile', profileMiddleWare, upload.single('image'), async (req, res) => {
     const { role, description } = req.body;
-    const imagePath = req.file ? req.file.path : null;
+    
     const userId = req.user._id;
+    
     try {
         const updatedUser = await User.findByIdAndUpdate(userId, {
             role,
-            description,
-            ...(imagePath && { profile: imagePath })
+            description
         }, { new: true });
 
         res.json(updatedUser);

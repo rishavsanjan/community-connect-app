@@ -16,8 +16,13 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    profile: {
-        type: String
+    profilePic: {
+        type: String,
+        default:'https://img.icons8.com/?size=100&id=7819&format=png&color=000000'
+    },
+    backPic: {
+        type: String,
+        default:'https://cdn.pixabay.com/photo/2018/12/01/09/53/network-3849202_1280.jpg'
     },
     resourcesRequested: [{
         type: mongoose.Schema.Types.ObjectId,

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Image, Text, TouchableOpacity, View, ScrollView } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { Platform } from 'react-native';
+import HeaderScreen from './HeaderScreen';
 
 
 export default function HomeScreen({navigation}) {
@@ -70,28 +71,7 @@ export default function HomeScreen({navigation}) {
   return (
     <ScrollView>
       <View className=''>
-        <View className="flex justify-between bg-blue-500 flex-col p-4">
-
-          <View className='flex flex-row justify-between mb-6'>
-            <Text className="text-white text-2xl font-bold ">
-              Community <Text className="text-cyan-400">Connect</Text>
-            </Text>
-            <View className='flex-row items-center gap-4'>
-              <Image
-                source={{ uri: "https://img.icons8.com/ios-filled/50/000000/appointment-reminders.png" }}
-                className='w-8 h-8'
-              />
-              <Image
-                source={{ uri: "https://img.icons8.com/?size=100&id=34105&format=png&color=000000" }}
-                className='w-10 h-10'
-              />
-            </View>
-          </View>
-
-          <View>
-            <TextInput placeholder='Search resources here' className='bg-white  text-gray-500 '></TextInput>
-          </View>
-        </View>
+        <HeaderScreen/>
         <View className='bg-orange-500 flex p-4 gap-4'>
           <Text className='text-white font-semibold text-3xl'>Find Local Community Resources</Text>
           <Text className='text-white text-lg'>Connecting people with food banks, shelters, job training, healthcare, and more</Text>

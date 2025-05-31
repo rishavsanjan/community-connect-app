@@ -14,20 +14,24 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const baseURL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
+  const baseURL = Platform.OS === 'android' ? 'http://10.0.2.2:5000/profile' : 'http://localhost:5000/profile';
   const handleLogin = async () => {
     try {
-      console.log('hello')
-      const response = await axios.post(`${baseURL}/login`, {
-        email: email,
-        password: password
-      });
 
-      if (Platform.OS === 'web') {
-        localStorage.setItem('token', response.data.token);
-      } else {
-        await AsyncStorage.setItem('token', response.data.token);
-      }
+      console.log("Platform:", Platform.OS, "Base URL:", baseURL);
+
+
+       const response = await axios.post(`${baseURL}`, {
+         email: email,
+         password: password
+       });
+         console.log('hello')
+
+       if (Platform.OS === 'web') {
+         localStorage.setItem('token', response.data.token);
+       } else {
+         await AsyncStorage.setItem('token', response.data.token);
+       }
 
       console.log("Token saved:", response.data.token);
 
@@ -35,6 +39,7 @@ export default function LoginScreen({ navigation }) {
       navigation.navigate("Main");
 
     } catch (err) {
+      console.log(err)
       if (err.response?.status === 409) {
         setError(err.response.data.message);
       } else {
