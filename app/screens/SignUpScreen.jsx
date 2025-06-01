@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Text, TextInput, TextInputComponent, Switch, TouchableOpacity, View, ScrollView } from "react-native";
 import { Checkbox } from 'react-native-paper';
+import { Platform } from 'react-native';
+import Toast from 'react-native-toast-message';
+
 
 export default function SignUpScreen({ navigation }) {
     const [checked, setChecked] = useState(false);
@@ -14,6 +17,7 @@ export default function SignUpScreen({ navigation }) {
     const [error, setError] = useState('');
     const [login, setLogin] = useState();
     const [conditions, setConditions] = useState(false);
+    const baseURL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
 
 
     return (
@@ -57,7 +61,66 @@ export default function SignUpScreen({ navigation }) {
                             <Text className="font-semibold">I agree to all the terms and comditions</Text>
                         </View>
                         <View className="">
-                            <TouchableOpacity className="bg-blue-500 rounded-lg w-full flex flex-row justify-center">
+                            <TouchableOpacity onPress={async () => {
+
+                                if (password !== confirmPassword) {
+                                    return alert("passwords dont match")
+                                }
+                                try {
+
+                                    const response = await fetch(`${baseURL}/signup`, {
+                                        method: 'POST',
+                                        body: JSON.stringify({
+                                            firstName: firstName,
+                                            lastName: lastName,
+                                            email: email,
+                                            zipCode: zipCode,
+                                            phoneNumber: phoneNumber,
+                                            password: password,
+                                            role: null,
+                                            description: null
+                                        }),
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'email': email,
+                                        },
+                                    });
+
+                                    const json = await response.json();
+
+
+                                    if (response.status === 409) {
+
+                                        setError(json.message);
+                                    } else if (response.ok) {
+
+                                        setFirstName('');
+                                        setLastName('');
+                                        setEmail('');
+                                        setZipCode('');
+                                        setPassword('');
+                                        setConfirmPassword('');
+                                        setPhoneNumber('');
+
+                                        Toast.show({
+                                            type: 'success',
+                                            text1: 'SignedUp Successfully! Please Login Now',
+                                            position: 'top'
+                                        });
+                                        navigation.navigate("Login")
+
+                                    } else {
+                                        Toast.show({
+                                            type: 'error',
+                                            text1: `${json.message || "Wrong Input"}`,
+                                            position: 'top'
+                                        });
+                                    }
+                                } catch (err) {
+                                    console.log(err.message)
+                                    setError("Error: " + err.message);
+                                }
+                            }} className="bg-blue-500 rounded-lg w-full flex flex-row justify-center">
                                 <Text className="text-white p-2 font-semibold">SignUp</Text>
                             </TouchableOpacity>
                         </View>

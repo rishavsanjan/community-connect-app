@@ -7,6 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import Toast from 'react-native-toast-message';
 import { ImageBackground } from 'react-native';
+import * as Location from 'expo-location';
+
 
 
 export default function UserInfoScreen({ navigation, route }) {
@@ -15,7 +17,12 @@ export default function UserInfoScreen({ navigation, route }) {
     const [loggedInId, setLoggedInId] = useState([]);
     const [status, setStatus] = useState('');
 
+
     const baseURL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
+
+    const [city, setCity] = useState(null);
+
+    
 
     useEffect(() => {
         const token = AsyncStorage.getItem('token');
@@ -43,17 +50,48 @@ export default function UserInfoScreen({ navigation, route }) {
 
         fetchProfile();
     }, [])
-    console.log(userInfo.backPic)
+
+    const getConnectionStatus = async () => {
+        const token = await AsyncStorage.getItem('token');
+        console.log('token is ' + token)
+        const res = await fetch(`${baseURL}/connection-status/${id}`, {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        });
+        const data = await res.json();
+        setStatus(data.status);
+    };
+    useEffect(() => {
+
+        getConnectionStatus();
+    }, [id])
+
+    function sendConnection() {
+        const sendRequest = async () => {
+            const token = await AsyncStorage.getItem('token');
+            const response = await fetch(`${baseURL}/addfriend/${userInfo._id}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            const data = await response.json();
+            await getConnectionStatus();
+        }
+        sendRequest();
+    }
+
 
     return (
         <ScrollView>
-            <ImageBackground source={{uri:`${userInfo.backPic}`}} resizeMethod="cover" className="flex-1 items-center justify-center">
+            <ImageBackground source={{ uri: `${userInfo.backPic}` }} resizeMethod="cover" className="flex-1 items-center justify-center">
                 <View style={{ backgroundColor: 'transparent' }} className="p-8 flex items-center gap-2">
                     <Image style={{ height: 120, width: 120 }} className="border-4 rounded-full border-white" source={{ uri: `${userInfo.profilePic}` }} />
                     <Text className="text-white font-medium text-3xl">{userInfo.firstName + ' ' + userInfo.lastName}</Text>
                     <Text className="text-lg text-white">Jammu</Text>
-                    <TouchableOpacity className="bg-green-300/30 p-2 px-4 rounded-xl">
-                        <Text className="text-green-400">Connected</Text>
+                    <TouchableOpacity disabled={status === 'Connected'} onPress={() => { sendConnection() }} className="bg-green-300/30 p-2 px-4 rounded-xl">
+                        <Text className="text-green-400">{status}</Text>
                     </TouchableOpacity>
                 </View>
             </ImageBackground>
@@ -91,7 +129,7 @@ export default function UserInfoScreen({ navigation, route }) {
                 </View>
                 <View className="bg-gray-100 p-4 rounded-xl border-l-4 border-blue-500">
                     <Text className="text-gray-500">Location</Text>
-                    <Text className="text-blue-500 text-lg">Jammu</Text>
+                    <Text className="text-blue-500 text-lg">{city}</Text>
                 </View>
                 <View className="bg-gray-100 p-4 rounded-xl border-l-4 border-blue-500">
                     <Text className="text-gray-500">ZIPCODE</Text>

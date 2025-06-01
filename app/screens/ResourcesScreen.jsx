@@ -54,7 +54,7 @@ export default function Resources({ navigation }) {
 
     const renderResource = ({ item }) => {
         return (
-            <TouchableOpacity onPress={() => navigation.navigate('ResourceDetails', { id: item._id })} className="flex flex-col gap-1 p-4 border rounded-xl my-2 bg-white">
+            <TouchableOpacity onPress={() => navigation.navigate('ResourceDetails', { id: item._id })} className="flex flex-col gap-1 p-4 border rounded-xl my-2  bg-white">
                 <View className="flex flex-row justify-between items-center">
                     <Text className="text-black font-semibold text-xl">{item.resourceType}</Text>
                     <Text className={`${item.resourcePriority == 'Medium Priority' && 'bg-yellow-400 border-yellow-600'}
@@ -93,7 +93,7 @@ export default function Resources({ navigation }) {
     return (
         <>
             <HeaderScreen />
-            <View className="flex flex-1 gap-4  m-4 p-4 rounded-xl  border">
+            <View className="flex flex-1 gap-4  mx-4 mt-4 p-4   rounded-tl-2xl rounded-tr-2xl bg-white">
                 <View className="flex   justify-between flex-row ">
                     <Pressable onPress={() => { setFilter('all'); fetchResource() }} className={`${filter === 'all' ? 'bg-blue-500' : 'bg-gray-300'} p-2 rounded-3xl px-4`}>
                         <Text className={`${filter === 'all' ? 'text-white' : ' text-gray-600'}  font-bold`}>All</Text>
@@ -120,10 +120,10 @@ export default function Resources({ navigation }) {
                     </Pressable>
                 </View>
                 <View>
-                    <View>
+                    <View className="mb-4">
                         <Text className="text-3xl font-bold">All Resources</Text>
                     </View>
-                    <View>
+                    <View className="mb-36">
                         <FlatList data={resource} renderItem={renderResource} keyExtractor={item => item._id.toString()} />
                     </View>
                 </View>

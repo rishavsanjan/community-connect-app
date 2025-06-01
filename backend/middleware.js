@@ -4,7 +4,10 @@ const { JWT_SECRET } = require('../backend/config');
 
 
 function middleWare(req, res, next) {
-    const { email } = req.body;
+    
+    const email = req.headers.email;
+    console.log(req)
+    
 
     User.findOne({
         email: email

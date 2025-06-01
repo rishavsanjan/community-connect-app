@@ -130,7 +130,9 @@ app.post('/signup', middleWare, async (req, res) => {
             msg: 'wrong input'
         })
     }
+    console.log(req.body)
     const { firstName, lastName, email, zipCode, phoneNumber, password } = req.body;
+    
     const formattedFirstName = capitalizeName(firstName);
     const formattedLastName = capitalizeName(lastName);
 
@@ -222,14 +224,17 @@ app.get('/resourcerequest', async (req, res) => {
 })
 
 app.put('/editprofile', profileMiddleWare, upload.single('image'), async (req, res) => {
-    const { role, description } = req.body;
+    const { role, description, imageUri,backImageUri } = req.body;
+    console.log(imageUri)
     
     const userId = req.user._id;
     
     try {
         const updatedUser = await User.findByIdAndUpdate(userId, {
             role,
-            description
+            description,
+            profilePic:imageUri,
+            backPic:backImageUri
         }, { new: true });
 
         res.json(updatedUser);
@@ -551,6 +556,7 @@ app.put('/disconnect/:userId/:deleteId', async (req, res) => {
 
 app.get('/connection-status/:senderId', profileMiddleWare, async (req, res) => {
     const { senderId } = req.params;
+    console.log(senderId)
     const userId = req.user._id;
     const user = await User.findById(userId);
     const isConnected = user.connections.find(

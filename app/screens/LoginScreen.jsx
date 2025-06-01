@@ -4,8 +4,7 @@ import { Checkbox } from 'react-native-paper';
 import axios from 'axios';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
+import Toast from 'react-native-toast-message';
 
 
 export default function LoginScreen({ navigation }) {
@@ -14,36 +13,49 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const baseURL = Platform.OS === 'android' ? 'http://10.0.2.2:5000/profile' : 'http://localhost:5000/profile';
+  const baseURL = Platform.OS === 'android' ? 'http://10.0.2.2:5000/login' : 'http://localhost:5000/login';
   const handleLogin = async () => {
     try {
 
       console.log("Platform:", Platform.OS, "Base URL:", baseURL);
 
 
-       const response = await axios.post(`${baseURL}`, {
-         email: email,
-         password: password
-       });
-         console.log('hello')
+      const response = await axios.post(`${baseURL}`, {
+        email: email,
+        password: password
+      });
+      console.log('hello')
 
-       if (Platform.OS === 'web') {
-         localStorage.setItem('token', response.data.token);
-       } else {
-         await AsyncStorage.setItem('token', response.data.token);
-       }
+      if (Platform.OS === 'web') {
+        localStorage.setItem('token', response.data.token);
+      } else {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
 
       console.log("Token saved:", response.data.token);
 
-
+      Toast.show({
+        type: 'success',
+        text1: 'Logged In Successfully',
+        position: 'top'
+      });
       navigation.navigate("Main");
 
     } catch (err) {
       console.log(err)
       if (err.response?.status === 409) {
+        Toast.show({
+          type: 'error',
+          text1: `${err.response.data.message}`,
+          position: 'top'
+        });
         setError(err.response.data.message);
       } else {
-        setError(err.response?.data?.message || "Something went wrong");
+        Toast.show({
+          type: 'error',
+          text1: `${err.response.data.message || "Something went wrong"}`,
+          position: 'top'
+        });
       }
     }
   };
