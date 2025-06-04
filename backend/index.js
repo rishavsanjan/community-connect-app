@@ -523,10 +523,9 @@ app.get('/messages', profileMiddleWare, async (req, res) => {
     const todo = await Messages.find({
         $or: [
             { sender: user }
-            //   {receiver: user}
         ]
-    })
-    res.json({ msg: todo })
+    }).sort({timeStamp:-1})
+    res.json({ msg: todo, senderId:req.user._id })
 })
 
 app.get('/allmessages', profileMiddleWare, async (req, res) => {

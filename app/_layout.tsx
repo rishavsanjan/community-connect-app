@@ -17,6 +17,7 @@ import ResourceDetailScreen from "./screens/ResourceDetailsScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import ConnectionRequestsScreen from "./screens/ConnectionRequestsScreen";
 import UserInfo from "./screens/UserInfoScreen";
+import MessagesScreen from "./screens/MessagesScreen"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 
@@ -32,6 +33,15 @@ function BottomTabs() {
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Messages"
+        component={MessagesScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="chatbubbles-outline" color={color} size={size} />
           ),
         }}
       />
@@ -78,12 +88,13 @@ function BottomTabs() {
 export default function Index() {
   return (
     <>
-      <Stack.Navigator initialRouteName="Main" screenOptions={{ headerShown: true }}>
+      <Stack.Navigator initialRouteName="Messages" screenOptions={{ headerShown: true }}>
         <Stack.Screen name="Main" component={BottomTabs} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="ResourceDetails" component={ResourceDetailScreen} />
         <Stack.Screen name="UserInfo" component={UserInfo} />
+        <Stack.Screen name="Messages" component={MessagesScreen} />
       </Stack.Navigator>
       <Toast config={toastConfig}/>
     </>
