@@ -79,6 +79,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on('send_private_message', async ({ to, from, message }) => {
+        console.log('recieved')
         const receiverSocketId = users[to];
         await Messages.create({
             sender: from,

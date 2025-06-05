@@ -88,7 +88,7 @@ function BottomTabs() {
 export default function Index() {
   return (
     <>
-      <Stack.Navigator initialRouteName="Messages" screenOptions={{ headerShown: true }}>
+      <Stack.Navigator initialRouteName="Main" screenOptions={{ headerShown: true }}>
         <Stack.Screen name="Main" component={BottomTabs} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
