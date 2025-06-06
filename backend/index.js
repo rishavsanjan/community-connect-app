@@ -160,6 +160,7 @@ app.post('/login', emailCheckMiddlware, passwordCheckMiddlware, async (req, res)
 })
 
 app.get('/profile', profileMiddleWare, async (req, res) => {
+    console.log('hello')
     const user = req.user;
     res.json({
         userId: user._id,

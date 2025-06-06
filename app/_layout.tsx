@@ -18,6 +18,7 @@ import ProfileScreen from "./screens/ProfileScreen";
 import ConnectionRequestsScreen from "./screens/ConnectionRequestsScreen";
 import UserInfo from "./screens/UserInfoScreen";
 import MessagesScreen from "./screens/MessagesScreen"
+import ConnectionsScreen from "./screens/ConnectionsScreen"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 
@@ -95,6 +96,7 @@ export default function Index() {
         <Stack.Screen name="ResourceDetails" component={ResourceDetailScreen} />
         <Stack.Screen name="UserInfo" component={UserInfo} />
         <Stack.Screen name="Messages" component={MessagesScreen} />
+        <Stack.Screen name="Connections" component={ConnectionsScreen} />
       </Stack.Navigator>
       <Toast config={toastConfig}/>
     </>

@@ -304,10 +304,10 @@ export default function ProfileScreen({ navigation }) {
                         </View>
                     </Pressable>
                     <Pressable style={{ borderColor: 'purple' }} className='flex flex-row items-center gap-8 bg-purple-200 rounded-xl p-5 border'>
-                        <View>
+                        <Pressable onPress={() => navigation.navigate('Connections')}>
                             <Text className='text-purple-800 text-3xl font-semibold'>{profile?.connections?.length || '0'}</Text>
                             <Text className='text-purple-500 font-semibold'>Connections</Text>
-                        </View>
+                        </Pressable>
                         <View className='bg-purple-300 p-3 rounded-xl'>
                             <Image style={{ height: 25, width: 25 }} source={{ uri: 'https://img.icons8.com/?size=100&id=K7ebDTcbruY8&format=png&color=000000' }} />
                         </View>
