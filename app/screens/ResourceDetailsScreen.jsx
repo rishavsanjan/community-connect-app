@@ -4,6 +4,10 @@ import { FlatList, Pressable } from "react-native";
 import { Image, Text, TouchableOpacity, View, ScrollView } from 'react-native';
 import { Platform } from 'react-native';
 import { TextInput } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 
 export default function ResourceDetaiLScreen({ navigation, route }) {
@@ -54,7 +58,6 @@ export default function ResourceDetaiLScreen({ navigation, route }) {
                 const senderInfo = await res.json();
                 userData[conn.userId] = senderInfo.msg;
             }));
-
             setUserInfo(userData);
         }
 
@@ -70,13 +73,58 @@ export default function ResourceDetaiLScreen({ navigation, route }) {
                 }
             })
             const data = await response.json();
-            console.log(data)
             setCommenterId(data);
         }
         commenterUserName();
     }, []);
 
-    console.log(username)
+
+    function timeAgo(date) {
+        const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+
+        const intervals = [
+            { label: 'year', seconds: 31536000 },
+            { label: 'month', seconds: 2592000 },
+            { label: 'day', seconds: 86400 },
+            { label: 'hour', seconds: 3600 },
+            { label: 'minute', seconds: 60 },
+            { label: 'second', seconds: 1 }
+        ];
+
+        for (const interval of intervals) {
+            const count = Math.floor(seconds / interval.seconds);
+            if (count > 0) {
+                return `${count} ${interval.label}${count !== 1 ? 's' : ''} ago`;
+            }
+        }
+
+        return "just now";
+    }
+    console.log(fetchedComment)
+
+    async function addComment() {
+        console.log('hello')
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${baseURL}/addingcomment/${resource._id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': "application/json",
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                commentDescription: comment
+            })
+        })
+        Toast.show({
+            type: 'success',
+            text1: 'Commet Added Successfully!',
+            position: 'top'
+        });
+        setComment('');
+        setCommentAdded('Comment Added Succesfully!');
+        setFetchedComment(prev => [...prev, { userId: commenterId.userId, commentDescription: comment }]);
+    }
+
 
     return (
         <ScrollView>
@@ -120,10 +168,10 @@ export default function ResourceDetaiLScreen({ navigation, route }) {
                 </View>
                 <View className="flex flex-row justify-between bg-gray-200 p-3 rounded-2xl">
                     <Text className="text-gray-800 font-medium">Requested By</Text>
-                    <TouchableOpacity onPress={() => {navigation.navigate('UserInfo', {id : username._id})}}>
+                    <TouchableOpacity onPress={() => { navigation.navigate('UserInfo', { id: username._id }) }}>
                         <Text className="font-normal text-blue-500">@{username.firstName + username.lastName}</Text>
                     </TouchableOpacity>
-                    
+
                 </View>
                 <Text className="font-semibold text-lg">Details</Text>
                 <Text className="text-gray-600 text-lg bg-gray-200 p-2 rounded-2xl">{resource.resourceDescription}</Text>
@@ -153,11 +201,49 @@ export default function ResourceDetaiLScreen({ navigation, route }) {
                     </View>
                 </View>
                 <View className="flex gap-4 ">
-                    <TextInput mode="flat" underlineColor="transparent" className="rounded-2xl " placeholder="Add a comment..."></TextInput>
-                    <TouchableOpacity className="bg-blue-600 p-3 rounded-xl flex flex-row justify-center">
+                    <TextInput onChangeText={(text) => setComment(text)} mode="flat" underlineColor="transparent" className="rounded-2xl " placeholder="Add a comment..."></TextInput>
+                    <TouchableOpacity onPress={() => addComment()} className="bg-blue-600 p-3 rounded-xl flex flex-row justify-center">
                         <Text className="text-white font-medium ">Add Comment</Text>
                     </TouchableOpacity>
                 </View>
+                <View className="">
+                    <Text className="text-xl font-bold pb-4">All Comments</Text>
+
+                    <View className="border border-gray-400 mb-4 mt-4" />
+
+                    <View className="flex px-4 backdrop-blur-2xl shadow-xl rounded-xl border flex-col gap-4 pb-4">
+                        <Text className="py-4">
+                            {fetchedComment.length} {fetchedComment.length <= 1 ? 'Comment' : 'Comments'}
+                        </Text>
+
+                        {fetchedComment.map((obj, index) => {
+                            const user = userInfo[obj.userId];
+                            console.log(user)
+
+                            const postedAgo = obj.createdAt ? timeAgo(obj.createdAt) : 'just now';
+
+                            return (
+                                <View
+                                    key={index}
+                                    className="border backdrop-blur-xl shadow-sm p-3 rounded-xl hover:-translate-y-2 transition flex flex-col gap-2 mb-4"
+                                >
+                                    <View className="flex flex-row gap-4 items-center">
+                                        <Image style={{ height: 40, width: 40 }} source={{ uri: `${user?.profilePic || 'Loading...'}` }} className="rounded-full border" />
+                                        <View>
+                                            <Text className="font-bold text-md">{user ? `${user.firstName} ${user.lastName}` : 'Unknown User'}</Text>
+                                            <Text className="text-blue-400">{obj.commentDescription}</Text>
+                                        </View>
+                                    </View>
+
+                                    <View>
+                                        <Text className="text-gray-700">{postedAgo}</Text>
+                                    </View>
+                                </View>
+                            );
+                        })}
+                    </View>
+                </View>
+
             </View>
         </ScrollView>
     )
