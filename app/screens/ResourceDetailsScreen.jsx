@@ -23,58 +23,61 @@ export default function ResourceDetaiLScreen({ navigation, route }) {
     const { id } = route.params;
 
     const baseURL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
+    const commenterUserName = async () => {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${baseURL}/profile`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': "application/json",
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        const data = await response.json();
+        setCommenterId(data);
+    }
+
+    const fetchResource = async () => {
+        const response = await fetch(`${baseURL}/resourcedetails/${id}`);
+        const data = await response.json();
+
+        setResource(data.todo);
+        setFetchedComment(data.todo.comment);
+
+        if (data.todo && data.todo.createdAt) {
+            const date = new Date(data.todo.createdAt);
+            setFormattedDate(date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }));
+        }
+
+        const fetchUserName = async () => {
+            const response2 = await fetch(`${baseURL}/fetchusername/${data.todo.userId}`);
+            const data2 = await response2.json();
+            setUserName(data2.todo);
+        }
+        fetchUserName();
+
+
+        const userData = {};
+        await Promise.all(data.todo.comment.map(async (conn) => {
+            const res = await fetch(`${baseURL}/connectionsenderdata/${conn.userId}`, {
+                method: 'GET'
+            })
+            const senderInfo = await res.json();
+            userData[conn.userId] = senderInfo.msg;
+        }));
+        setUserInfo(userData);
+    }
 
 
     useEffect(() => {
-        const fetchResource = async () => {
-            const response = await fetch(`${baseURL}/resourcedetails/${id}`);
-            const data = await response.json();
 
-            setResource(data.todo);
-            setFetchedComment(data.todo.comment);
-
-            if (data.todo && data.todo.createdAt) {
-                const date = new Date(data.todo.createdAt);
-                setFormattedDate(date.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }));
-            }
-
-            const fetchUserName = async () => {
-                const response2 = await fetch(`${baseURL}/fetchusername/${data.todo.userId}`);
-                const data2 = await response2.json();
-                setUserName(data2.todo);
-            }
-            fetchUserName();
-
-
-            const userData = {};
-            await Promise.all(data.todo.comment.map(async (conn) => {
-                const res = await fetch(`${baseURL}/connectionsenderdata/${conn.userId}`, {
-                    method: 'GET'
-                })
-                const senderInfo = await res.json();
-                userData[conn.userId] = senderInfo.msg;
-            }));
-            setUserInfo(userData);
-        }
 
         fetchResource();
 
-        const commenterUserName = async () => {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${baseURL}/profile`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': "application/json",
-                    'Authorization': 'Bearer ' + token
-                }
-            })
-            const data = await response.json();
-            setCommenterId(data);
-        }
+
         commenterUserName();
     }, []);
 
@@ -123,6 +126,8 @@ export default function ResourceDetaiLScreen({ navigation, route }) {
         setComment('');
         setCommentAdded('Comment Added Succesfully!');
         setFetchedComment(prev => [...prev, { userId: commenterId.userId, commentDescription: comment }]);
+        commenterUserName();
+        fetchResource();
     }
 
 
@@ -211,7 +216,7 @@ export default function ResourceDetaiLScreen({ navigation, route }) {
 
                     <View className="border border-gray-400 mb-4 mt-4" />
 
-                    <View className="flex px-4 backdrop-blur-2xl shadow-xl rounded-xl border flex-col gap-4 pb-4">
+                    <View className="flex px-4   rounded-xl border flex-col gap-4 pb-4">
                         <Text className="py-4">
                             {fetchedComment.length} {fetchedComment.length <= 1 ? 'Comment' : 'Comments'}
                         </Text>
@@ -225,7 +230,7 @@ export default function ResourceDetaiLScreen({ navigation, route }) {
                             return (
                                 <View
                                     key={index}
-                                    className="border backdrop-blur-xl shadow-sm p-3 rounded-xl hover:-translate-y-2 transition flex flex-col gap-2 mb-4"
+                                    className="border  p-3 rounded-xl hover:-translate-y-2 transition flex flex-col gap-2 mb-4"
                                 >
                                     <View className="flex flex-row gap-4 items-center">
                                         <Image style={{ height: 40, width: 40 }} source={{ uri: `${user?.profilePic || 'Loading...'}` }} className="rounded-full border" />

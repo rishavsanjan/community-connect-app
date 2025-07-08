@@ -70,8 +70,8 @@ export default function HomeScreen({navigation}) {
   ];
   return (
     <ScrollView>
-      <View className=''>
-        <HeaderScreen/>
+      <View className='z-10'>
+        <HeaderScreen navigation={navigation}/>
         <View className='bg-orange-500 flex p-4 gap-4'>
           <Text className='text-white font-semibold text-3xl'>Find Local Community Resources</Text>
           <Text className='text-white text-lg'>Connecting people with food banks, shelters, job training, healthcare, and more</Text>

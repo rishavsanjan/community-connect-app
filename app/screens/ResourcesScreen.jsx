@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import { FlatList, Pressable } from "react-native";
 import { Image, Text, TouchableOpacity, View, ScrollView } from 'react-native';
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import HeaderScreen from './HeaderScreen'
 
 export default function Resources({ navigation }) {
     const [filter, setFilter] = useState('all');
     const [resource, setResource] = useState([]);
+    const [userId, setUserId] = useState('');
+    const [user, setUser] = useState([]);
+
+
 
 
     const baseURL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
@@ -28,6 +33,49 @@ export default function Resources({ navigation }) {
     useEffect(() => {
         fetchResource();
     }, [])
+
+    useEffect(() => {
+        const userid = async () => {
+            const token = await AsyncStorage.getItem('token');
+
+            const response = await fetch(`${baseURL}/profile`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': "application/json",
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            const data = await response.json();
+            setUser(data);
+            setUserId(data.userId);
+
+        }
+        userid();
+        fetchResource();
+    }, []);
+
+
+    async function upvote(id) {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${baseURL}/upvote`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': "application/json",
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                resourceId: id,
+                voteType: 'upvote'
+            })
+        })
+        const data = await response.json();
+        setResource(prev =>
+            prev.map(item =>
+                item._id === id ? { ...item, votes: data.votes } : item
+            )
+        );
+
+    }
 
 
     function timeAgo(date) {
@@ -75,10 +123,10 @@ export default function Resources({ navigation }) {
                     <Text className="text-gray-600 bg-gray-200 p-2 rounded-2xl font-semibold text-sm">{timeAgo(item.createdAt)}</Text>
                 </View>
                 <View className="flex flex-row justify-start gap-6">
-                    <View className="flex flex-row items-center bg-gray-200 p-2 rounded-xl gap-2 px-4">
+                    <TouchableOpacity onPress={() => upvote(item._id)} className="flex flex-row items-center bg-gray-200 p-2 rounded-xl gap-2 px-4">
                         <Image source={{ uri: 'https://img.icons8.com/?size=100&id=11036&format=png&color=000000' }} className="w-6 h-6" />
                         <Text className="text-gray-600">{item.votes.length}</Text>
-                    </View>
+                    </TouchableOpacity>
                     <View className="flex flex-row bg-gray-200 rounded-xl gap-2 items-center px-4">
                         <Image source={{ uri: 'https://img.icons8.com/?size=100&id=38977&format=png&color=000000' }} className="w-6 h-6" />
                         <Text className="text-gray-600">{item.comment.length}</Text>
